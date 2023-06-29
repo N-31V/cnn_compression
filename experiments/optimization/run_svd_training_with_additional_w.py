@@ -12,7 +12,7 @@ from fedot_ind.core.operation.optimization.structure_optimization import SVDOpti
 from fedot_ind.core.operation.optimization.svd_tools import decompose_module
 from fedot_ind.core.operation.decomposition.decomposed_conv import DecomposedConv2d
 
-from supplemented_conv import SupplementedDecomposedConv2d
+from optim.supplemented_conv import SupplementedDecomposedConv2d
 
 def change_layers(model: torch.nn.Module, mode: str) -> None:
     for name, module in model.named_children():
