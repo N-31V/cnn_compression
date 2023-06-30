@@ -1,21 +1,24 @@
+from typing import Dict
 import torch
 
 
-def profile(model, name, input_size):
-    model.to('cuda')
+def profile(model, name, input_size, device='cuda'):
+    model.to(device)
     model.eval()
-    image = torch.randn(input_size, device='cuda')
+    image = torch.randn(input_size, device=device)
     with torch.profiler.profile(
         activities=[
             torch.profiler.ProfilerActivity.CPU,
             torch.profiler.ProfilerActivity.CUDA,
         ],
-        on_trace_ready=torch.profiler.tensorboard_trace_handler(f'./log/{name}'), with_flops=True) as prof:
-            outputs = model(image)
+        on_trace_ready=torch.profiler.tensorboard_trace_handler(f'./log/{name}'),
+        with_flops=True
+    ) as prof:
+        outputs = model(image)
     return prof
 
 
-def _flop(profiler) -> int:
+def _flop(profiler) -> Dict:
     flops = {}
     for e in profiler.events():
         if e.flops != 0:
@@ -24,10 +27,13 @@ def _flop(profiler) -> int:
             else:
                 flops[e.key]['flops'] += e.flops
                 flops[e.key]['n'] += 1
-    for k, v in flops.items():
-        print(f"{k}: {v['flops']} flops, {v['n']} calls")
-    return sum([v['flops'] for v in flops.values()])
+    return flops
+
 
 def flop(model, name, input_size) -> int:
     prof = profile(model, name, input_size)
-    return _flop(prof)
+    flops = _flop(prof)
+    for k, v in flops.items():
+        print(f"{k}: {v['flops']} flops, {v['n']} calls")
+    print(f"total: {sum([v['flops'] for v in flops.values()])}")
+    return flops
