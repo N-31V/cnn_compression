@@ -30,10 +30,7 @@ def _flop(profiler) -> Dict:
     return flops
 
 
-def flop(model, name, input_size) -> int:
+def flop(model, name, input_size) -> Dict:
     prof = profile(model, name, input_size)
     flops = _flop(prof)
-    for k, v in flops.items():
-        print(f"{k}: {v['flops']} flops, {v['n']} calls")
-    print(f"total: {sum([v['flops'] for v in flops.values()])}")
     return flops
