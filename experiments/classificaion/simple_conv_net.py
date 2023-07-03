@@ -12,7 +12,7 @@ class SimpleConvNet3(torch.nn.Module):
 
     def __init__(
             self,
-            num_classes: int,
+            num_classes: int = 10,
             in_channels: int = 3,
             hidden1: int = 32,
             hidden2: int = 64,
