@@ -34,8 +34,11 @@ COMMON_PARAMS = {
     }
 }
 
-ZEROING = [partial(energy_filter_zeroing, energy_threshold=e) for e in [0.9, 0.93, 0.96, 0.99, 0.999]] + \
-          [partial(percentage_filter_zeroing, pruning_ratio=p) for p in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]]
+ENERGY_ZEROING = [0.9, 0.93, 0.96, 0.99, 0.999]
+PERSRNTAGE_ZEROIG = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+
+ZEROING = [partial(energy_filter_zeroing, energy_threshold=e) for e in ENERGY_ZEROING] + \
+          [partial(percentage_filter_zeroing, pruning_ratio=p) for p in PERSRNTAGE_ZEROIG]
 
 
 def get_mnist():
@@ -107,7 +110,7 @@ SMALL_GROUP_PARAMS = {
     'model': SimpleConvNet3,
     'model_name': 'SimpleConvNet',
     'sfp_params': {
-        'zeroing': ZEROING,
+        'zeroing_fn': ZEROING,
         'final_pruning_fn': prune_simple_conv_net,
         'model_class': SimpleConvNet3,
     }
@@ -118,7 +121,7 @@ MIDL_GROUP_PARAMS = {
     'model': resnet18,
     'model_name': 'ResNet18',
     'model_params': {'num_classes': 21},
-    'sfp_params': {'zeroing': ZEROING}
+    'sfp_params': {'zeroing_fn': ZEROING}
 }
 
 TASKS = {
@@ -175,7 +178,7 @@ TASKS = {
         'model_name': 'ResNet50',
         'model_params': {'num_classes': 1000},
         'sfp_params': {
-            'zeroing': ZEROING,
+            'zeroing_fn': ZEROING,
         },
         **COMMON_PARAMS
     },
