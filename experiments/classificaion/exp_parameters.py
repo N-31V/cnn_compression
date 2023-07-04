@@ -7,7 +7,7 @@ from torchvision.datasets import ImageFolder, MNIST, CIFAR10, FashionMNIST, Imag
 from torchvision.models import resnet18, resnet50, resnet101
 from fedot_ind.core.operation.optimization.sfp_tools import energy_filter_zeroing, percentage_filter_zeroing
 
-from simple_conv_net import SimpleConvNet3, prune_simple_conv_net
+from experiments.classificaion.simple_conv_net import SimpleConvNet3, prune_simple_conv_net
 
 
 DATASETS_ROOT = '/media/n31v/data/datasets'
@@ -135,12 +135,14 @@ TASKS = {
     'FashionMNIST': {
         'ds_name': 'FashionMNIST',
         'dataset': get_fashion,
+        'model_params': {},
         **SMALL_GROUP_PARAMS,
         **COMMON_PARAMS
     },
     'CIFAR10': {
         'ds_name': 'CIFAR10',
         'dataset': get_cifar,
+        'model_params': {},
         'dataloader_params': {'batch_size': 32, 'num_workers': 8},
         **SMALL_GROUP_PARAMS,
         **COMMON_PARAMS
