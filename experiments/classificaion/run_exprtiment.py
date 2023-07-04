@@ -79,9 +79,10 @@ def run(
 
 if __name__ == '__main__':
     f = [0, 1, 2, 3, 4]
-    start_t = datetime.now()
-    for t in ['minerals200']:
+    tasks = ['FashionMNIST', 'CIFAR10', 'LUSC', 'minerals']
+    for t in tasks:
+        start_t = datetime.now()
         run(TASKS[t], folds=f)
         run(TASKS[t], mode='svd', folds=f)
         run(TASKS[t], mode='sfp', folds=f)
-    print(f'Total time: {datetime.now() - start_t}')
+        print(f'Total {t} time: {datetime.now() - start_t}')
