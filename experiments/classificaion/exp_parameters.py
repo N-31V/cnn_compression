@@ -135,7 +135,7 @@ TASKS = {
     'FashionMNIST': {
         'ds_name': 'FashionMNIST',
         'dataset': get_fashion,
-        'model_params': {},
+        'model_params': {'in_channels': 1},
         **SMALL_GROUP_PARAMS,
         **COMMON_PARAMS
     },
