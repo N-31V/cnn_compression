@@ -47,7 +47,7 @@ class SimpleConvNet3(torch.nn.Module):
 
 
 def prune_simple_conv_net(model: SimpleConvNet3) -> SimpleConvNet3:
-    assert isinstance(model, SimpleConvNet3), "Supports only SimpleConvNet2 models"
+    assert isinstance(model, SimpleConvNet3), "Supports only SimpleConvNet models"
     sd = model.state_dict()
     hidden1 = _check_nonzero_filters(sd['layer1.0.weight'])
     sd['layer1.0.weight'] = _prune_filters(sd['layer1.0.weight'], saving_filters=hidden1)
@@ -73,6 +73,19 @@ def prune_simple_conv_net(model: SimpleConvNet3) -> SimpleConvNet3:
         hidden1=hidden1.numel(),
         hidden2=hidden2.numel(),
         hidden3=hidden3.numel(),
+    )
+    model.load_state_dict(sd)
+    return model
+
+
+def load_simple_conv_net(state_dict_path: str) -> SimpleConvNet3:
+    sd = torch.load(state_dict_path)
+    model = SimpleConvNet3(
+        num_classes=sd['fc.weight'].shape[0],
+        in_channels=sd['layer1.0.weight'].shape[1],
+        hidden1=sd['layer1.0.weight'].shape[0],
+        hidden2=sd['layer2.0.weight'].shape[0],
+        hidden3=sd['layer3.0.weight'].shape[0],
     )
     model.load_state_dict(sd)
     return model
