@@ -107,6 +107,7 @@ def get_image_folder(dataset: str, transforms):
 
 SMALL_GROUP_PARAMS = {
     'dataloader_params': {'batch_size': 64, 'num_workers': 8},
+    'device': 'cuda',
     'model': SimpleConvNet3,
     'model_name': 'SimpleConvNet',
     'sfp_params': {
@@ -118,6 +119,7 @@ SMALL_GROUP_PARAMS = {
 
 MIDL_GROUP_PARAMS = {
     'dataloader_params': {'batch_size': 32, 'num_workers': 8},
+    'device': 'cuda',
     'model': resnet18,
     'model_name': 'ResNet18',
     'model_params': {'num_classes': 21},
@@ -176,6 +178,7 @@ TASKS = {
         'ds_name': 'ImageNet',
         'dataset': get_imagenet,
         'dataloader_params': {'batch_size': 16, 'num_workers': 8},
+        'device': 'cuda:1',
         'model': resnet50,
         'model_name': 'ResNet50',
         'model_params': {'num_classes': 1000},
