@@ -182,9 +182,26 @@ TASKS = {
         'model': resnet50,
         'model_name': 'ResNet50',
         'model_params': {'num_classes': 1000},
-        'sfp_params': {
-            'zeroing_fn': ZEROING,
+        'fit_params': {
+            'num_epochs': 30,
+            'lr_scheduler': partial(StepLR, step_size=9, gamma=0.3),
+            'models_path': RESULT_PATH,
+            'summary_path': RESULT_PATH,
         },
-        **COMMON_PARAMS
+        'ft_params': {
+            'num_epochs': 3,
+            'lr_scheduler': partial(StepLR, step_size=1, gamma=0.3),
+            'models_path': RESULT_PATH,
+            'summary_path': RESULT_PATH,
+        },
+        'svd_params': {
+            'energy_thresholds': [0.7, 0.9, 0.99],
+            'decomposing_mode': ['channel', 'spatial'],
+            'hoer_loss_factor': [0.01],
+            'orthogonal_loss_factor': [10]
+        },
+        'sfp_params': {
+            'zeroing_fn': [partial(percentage_filter_zeroing, pruning_ratio=0.1)],
+        },
     },
 }
