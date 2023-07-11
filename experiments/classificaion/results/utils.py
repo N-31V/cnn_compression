@@ -14,7 +14,7 @@ def exp_list(dataset: str, folds=[0, 1],  n=[0, 1, 2, 3, 4]):
     exps = {'Baseline': f"{root}/mean"}
     sfp_exps = {
         'energy': {f'SFP energy {e}': f'{root}_SFP_energy_threshold-{e}/mean' for e in ENERGY_ZEROING},
-        'percentage': {f'SFP {pr * 100}%': f'{root}_SFP_pruning_ratio-{pr}/mean' for pr in PERSRNTAGE_ZEROIG},
+        'percentage': {f'SFP {int(pr * 100)}%': f'{root}_SFP_pruning_ratio-{pr}/mean' for pr in PERSRNTAGE_ZEROIG},
     }
     svd_exps = {
         'channel': {f'Hoer {hoer} Ort {ort}': f'{root}_SVD_channel_O-{ort}_H-{hoer}/mean' for hoer in hoer_loss_factor for ort in orthogonal_loss_factor},
