@@ -3,7 +3,7 @@ from functools import partial
 import numpy as np
 from torch.optim.lr_scheduler import StepLR
 from torchvision.transforms import Compose, ToTensor, Resize, Normalize
-from torchvision.datasets import ImageFolder, MNIST, CIFAR10, FashionMNIST, ImageNet
+from torchvision.datasets import ImageFolder, MNIST, CIFAR10, FashionMNIST, ImageNet, Food101
 from torchvision.models import resnet18, resnet50, resnet101
 from fedot_ind.core.operation.optimization.sfp_tools import energy_filter_zeroing, percentage_filter_zeroing
 
@@ -73,23 +73,24 @@ def get_cifar():
 
 
 def get_imagenet():
-    train_ds = ImageNet(
-        root=os.path.join(DATASETS_ROOT, 'ImageNet'),
-        transform=Compose([
+    transform = Compose([
             ToTensor(),
-            Resize((500, 500), antialias=True),
+            Resize((512, 512), antialias=True),
             Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
         ])
-    )
-    val_ds = ImageNet(
-        root=os.path.join(DATASETS_ROOT, 'ImageNet'),
-        split='val',
-        transform=Compose([
+    train_ds = ImageNet(root=os.path.join(DATASETS_ROOT, 'ImageNet'),transform=transform)
+    val_ds = ImageNet(root=os.path.join(DATASETS_ROOT, 'ImageNet'), split='val', transform=transform)
+    return train_ds, val_ds
+
+
+def get_food():
+    transform = Compose([
             ToTensor(),
-            Resize((500, 500), antialias=True),
-            Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+            Resize((512, 512), antialias=True),
+            Normalize(mean=(0.549, 0.445, 0.344), std=(0.273, 0.276, 0.280))
         ])
-    )
+    train_ds = Food101(root=os.path.join(DATASETS_ROOT, 'Food101'), transform=transform)
+    val_ds = Food101(root=os.path.join(DATASETS_ROOT, 'Food101'), split='test', transform=transform)
     return train_ds, val_ds
 
 
@@ -124,6 +125,32 @@ MIDL_GROUP_PARAMS = {
     'model_name': 'ResNet18',
     'model_params': {'num_classes': 21},
     'sfp_params': {'zeroing_fn': ZEROING}
+}
+
+BIG_GROUP_PARAMS = {
+    'dataloader_params': {'batch_size': 16, 'num_workers': 8},
+    'device': 'cuda:1',
+    'model': resnet50,
+    'model_name': 'ResNet50',
+    'sfp_params': {'zeroing_fn': [partial(percentage_filter_zeroing, pruning_ratio=p) for p in [0.1, 0.3, 0.5, 0.7]]},
+    'fit_params': {
+        'num_epochs': 30,
+        'lr_scheduler': partial(StepLR, step_size=9, gamma=0.3),
+        'models_path': RESULT_PATH,
+        'summary_path': RESULT_PATH,
+    },
+    'ft_params': {
+        'num_epochs': 5,
+        'lr_scheduler': partial(StepLR, step_size=2, gamma=0.3),
+        'models_path': RESULT_PATH,
+        'summary_path': RESULT_PATH,
+    },
+    'svd_params': {
+        'energy_thresholds': [0.3, 0.5, 0.7, 0.9, 0.99],
+        'decomposing_mode': ['channel', 'spatial'],
+        'hoer_loss_factor': [0.1, 0.01],
+        'orthogonal_loss_factor': [10, 100]
+    }
 }
 
 TASKS = {
@@ -177,31 +204,13 @@ TASKS = {
     'ImageNet': {
         'ds_name': 'ImageNet',
         'dataset': get_imagenet,
-        'dataloader_params': {'batch_size': 16, 'num_workers': 8},
-        'device': 'cuda:1',
-        'model': resnet50,
-        'model_name': 'ResNet50',
         'model_params': {'num_classes': 1000},
-        'fit_params': {
-            'num_epochs': 30,
-            'lr_scheduler': partial(StepLR, step_size=9, gamma=0.3),
-            'models_path': RESULT_PATH,
-            'summary_path': RESULT_PATH,
-        },
-        'ft_params': {
-            'num_epochs': 3,
-            'lr_scheduler': partial(StepLR, step_size=1, gamma=0.3),
-            'models_path': RESULT_PATH,
-            'summary_path': RESULT_PATH,
-        },
-        'svd_params': {
-            'energy_thresholds': [0.7, 0.9, 0.99],
-            'decomposing_mode': ['channel', 'spatial'],
-            'hoer_loss_factor': [0.01],
-            'orthogonal_loss_factor': [10]
-        },
-        'sfp_params': {
-            'zeroing_fn': [partial(percentage_filter_zeroing, pruning_ratio=0.1)],
-        },
+        **BIG_GROUP_PARAMS
+    },
+    'Food101': {
+        'ds_name': 'Food101',
+        'dataset': get_food,
+        'model_params': {'num_classes': 101},
+        **BIG_GROUP_PARAMS
     },
 }
