@@ -10,7 +10,9 @@ from torchvision.models.detection import ssdlite320_mobilenet_v3_large, fasterrc
 from fedot_ind.core.architecture.experiment.nn_experimenter import ObjectDetectionExperimenter, FitParameters
 from fedot_ind.core.operation.optimization.structure_optimization import SFPOptimization, SVDOptimization
 
-logging.basicConfig(level=logging.INFO)
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(name)s - %(message)s')
+
 
 class_to_idx = {'person': 1, 'bird': 2, 'cat': 3, 'cow': 4, 'dog': 5, 'horse': 6, 'sheep': 7, 'aeroplane': 8,
                 'bicycle': 9, 'boat': 10, 'bus': 11, 'car': 12, 'motorbike': 13, 'train': 14, 'bottle': 15, 'chair': 16,
@@ -57,7 +59,8 @@ fit_params = FitParameters(
     models_path='/media/n31v/data/results/',
     summary_path='/media/n31v/data/results/',
     class_metrics=True,
-    description='cos_lrs'
+    validation_period=5,
+    description='CosineAnnealingWarmRestarts'
 )
 
 exp.fit(fit_params)
