@@ -42,23 +42,22 @@ def voc2coco(target):
 start_t = datetime.now()
 
 exp = ObjectDetectionExperimenter(
-    model=ssdlite320_mobilenet_v3_large()
+    model=fasterrcnn_resnet50_fpn(num_classes=21)
 )
 
 train_ds = VOCDetection('/media/n31v/data/datasets/VOC', transform=ToTensor(), target_transform=voc2coco)
 val_ds = VOCDetection('/media/n31v/data/datasets/VOC', image_set='val', transform=ToTensor(), target_transform=voc2coco)
 
-dl_params = dict(batch_size=16, num_workers=8, collate_fn=lambda x: tuple(zip(*x)))
+dl_params = dict(batch_size=4, num_workers=8, collate_fn=lambda x: tuple(zip(*x)))
 fit_params = FitParameters(
     dataset_name='VOC',
     train_dl=DataLoader(dataset=train_ds, shuffle=True, **dl_params),
     val_dl=DataLoader(dataset=val_ds, **dl_params),
-    num_epochs=500,
-    # lr_scheduler=partial(ReduceLROnPlateau, factor=0.3, patience=10, verbose=True),
+    num_epochs=300,
+    # lr_scheduler=partial(ReduceLROnPlateau, factor=0.3, patience=3, verbose=True),
     lr_scheduler=partial(CosineAnnealingWarmRestarts, T_0=10, T_mult=2),
     models_path='/media/n31v/data/results/',
     summary_path='/media/n31v/data/results/',
-    class_metrics=True,
     validation_period=5,
     description='CosineAnnealingWarmRestarts'
 )

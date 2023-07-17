@@ -95,8 +95,8 @@ def run_with_folds(
 
 if __name__ == '__main__':
     f = [0, 1, 2, 3, 4]
-    # tasks = ['FashionMNIST', 'CIFAR10', 'LUSC', 'minerals']
-    tasks = ['minerals']
+    tasks = ['MNIST', 'FashionMNIST', 'CIFAR10', 'LUSC', 'minerals']
+    # tasks = ['minerals']
     for t in tasks:
         start_t = datetime.now()
         run_with_folds(TASKS[t], folds=f)
