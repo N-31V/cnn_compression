@@ -16,18 +16,18 @@ from optim.flops import flop
 from experiments.classificaion.exp_parameters import ENERGY_ZEROING, PERSRNTAGE_ZEROIG, TASKS
 
 
-
-def exp_list(dataset_name: str, folds=[0, 1],  n=[0, 1, 2, 3, 4]) -> Dict:
+def exp_list(dataset_name: str, add_mean: bool = True) -> Dict:
     config = TASKS[dataset_name]
     hoer_loss_factor = config['svd_params']['hoer_loss_factor']
     orthogonal_loss_factor = config['svd_params']['orthogonal_loss_factor']
     root = f"/media/n31v/data/results/{config['ds_name']}/{config['model_name']}"
+    mean = '/mean' if add_mean else ''
     exps = {
-        'Baseline': f"{root}/mean",
-        'SFP energy': {f'SFP energy {e}': f'{root}_SFP_energy_threshold-{e}/mean' for e in ENERGY_ZEROING},
-        'SFP percentage': {f'SFP {int(pr * 100)}%': f'{root}_SFP_pruning_ratio-{pr}/mean' for pr in PERSRNTAGE_ZEROIG},
-        'SVD channel': {f'Hoer {hoer} Ort {ort}': f'{root}_SVD_channel_O-{ort}_H-{hoer}/mean' for hoer in hoer_loss_factor for ort in orthogonal_loss_factor},
-        'SVD spatial': {f'Hoer {hoer} Ort {ort}': f'{root}_SVD_spatial_O-{ort}_H-{hoer}/mean' for hoer in hoer_loss_factor for ort in orthogonal_loss_factor},
+        'Baseline': f"{root}{mean}",
+        'SFP energy': {f'SFP energy {e}': f'{root}_SFP_energy_threshold-{e}{mean}' for e in ENERGY_ZEROING},
+        'SFP percentage': {f'SFP {int(pr * 100)}%': f'{root}_SFP_pruning_ratio-{pr}{mean}' for pr in PERSRNTAGE_ZEROIG},
+        'SVD channel': {f'Hoer {hoer} Ort {ort}': f'{root}_SVD_channel_O-{ort}_H-{hoer}{mean}' for hoer in hoer_loss_factor for ort in orthogonal_loss_factor},
+        'SVD spatial': {f'Hoer {hoer} Ort {ort}': f'{root}_SVD_spatial_O-{ort}_H-{hoer}{mean}' for hoer in hoer_loss_factor for ort in orthogonal_loss_factor},
     }
     return exps
 
