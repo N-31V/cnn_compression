@@ -6,7 +6,8 @@ from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import ReduceLROnPlateau, CosineAnnealingWarmRestarts
 from torchvision.datasets import VOCDetection
 from torchvision.transforms import ToTensor
-from torchvision.models.detection import ssdlite320_mobilenet_v3_large, fasterrcnn_resnet50_fpn
+from torchvision.models.detection import ssdlite320_mobilenet_v3_large, fasterrcnn_resnet50_fpn, ssd300_vgg16
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from fedot_ind.core.architecture.experiment.nn_experimenter import ObjectDetectionExperimenter, FitParameters
 from fedot_ind.core.operation.optimization.structure_optimization import SFPOptimization, SVDOptimization
 
@@ -41,8 +42,14 @@ def voc2coco(target):
 
 start_t = datetime.now()
 
+# model = fasterrcnn_resnet50_fpn(weights='DEFAULT')
+# in_features = model.roi_heads.box_predictor.cls_score.in_features
+# model.roi_heads.box_predictor = FastRCNNPredictor(in_features, 21)
+
+model = ssd300_vgg16(num_classes=21)
+
 exp = ObjectDetectionExperimenter(
-    model=fasterrcnn_resnet50_fpn(num_classes=21)
+    model=model
 )
 
 train_ds = VOCDetection('/media/n31v/data/datasets/VOC', transform=ToTensor(), target_transform=voc2coco)
@@ -54,12 +61,12 @@ fit_params = FitParameters(
     train_dl=DataLoader(dataset=train_ds, shuffle=True, **dl_params),
     val_dl=DataLoader(dataset=val_ds, **dl_params),
     num_epochs=300,
-    # lr_scheduler=partial(ReduceLROnPlateau, factor=0.3, patience=3, verbose=True),
-    lr_scheduler=partial(CosineAnnealingWarmRestarts, T_0=10, T_mult=2),
+    lr_scheduler=partial(ReduceLROnPlateau, factor=0.3, patience=3, verbose=True),
+    # lr_scheduler=partial(CosineAnnealingWarmRestarts, T_0=10, T_mult=2),
     models_path='/media/n31v/data/results/',
     summary_path='/media/n31v/data/results/',
     validation_period=5,
-    description='CosineAnnealingWarmRestarts'
+    description='ReduceLROnPlateau'
 )
 
 exp.fit(fit_params)
